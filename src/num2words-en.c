@@ -1,6 +1,8 @@
 #include "num2words-en.h"
 #include "string.h"
 
+#define DO_O 1 // Set to print out o'one in the minutes vs one
+
 static const char* const ONES[] = {
   "o'clock",
   "one",
@@ -27,6 +29,19 @@ static const char* const TEENS[] ={
   "nineteen"
 };
 
+static const int const TRUNC_TEENS[] ={
+  0, // ten
+  0, // eleven
+  0, // twelve
+  0, // thirteen
+  1, // fourteen
+  0, // fifteen
+  0, // sixteen
+  1, // seventeen
+  1, // eighteen "eightteen"
+  1  // nineteen
+};
+
 static const char* const TENS[] = {
   "",
   "ten",
@@ -40,7 +55,20 @@ static const char* const TENS[] = {
   "ninety"
 };
 
-static size_t append_number(char* words, int num) {
+static int trunc_minutes(int minutes) {
+  
+  if ((minutes > 10) && (minutes < 20)) {
+    return TRUNC_TEENS[minutes-10];
+  }
+  else
+  { 
+    return 0;
+  }
+
+}
+
+
+static size_t append_number(char* words, int num, int minutes) {
   int tens_val = num / 10 % 10;
   int ones_val = num % 10;
 
@@ -60,6 +88,12 @@ static size_t append_number(char* words, int num) {
   }
 
   if (ones_val > 0 || num == 0) {
+#if DO_O
+    if ((minutes == 1) && (tens_val == 0) && (ones_val != 0))
+    {
+       strcat(words, "o'");
+    }
+#endif
     strcat(words, ONES[ones_val]);
     len += strlen(ONES[ones_val]);
   }
@@ -82,11 +116,11 @@ void time_to_words(int hours, int minutes, char* words, size_t length) {
   if (hours == 0 || hours == 12) {
     remaining -= append_string(words, remaining, TEENS[2]);
   } else {
-    remaining -= append_number(words, hours % 12);
+    remaining -= append_number(words, hours % 12, 0);
   }
 
   remaining -= append_string(words, remaining, " ");
-  remaining -= append_number(words, minutes);
+  remaining -= append_number(words, minutes, 1);
   remaining -= append_string(words, remaining, " ");
 }
 
@@ -114,7 +148,8 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 	}
 	
 	// Truncate long teen values
-	if (strlen(line2) > 7) {
+	//if (strlen(line2) > 7) {
+        if (trunc_minutes(minutes)) {
 		char *pch = strstr(line2, "teen");
 		if (pch) {
 			memcpy(line3, pch, 4);
