@@ -1,7 +1,7 @@
 #include "num2words-en.h"
 #include "string.h"
 
-#define DO_O 0 // Set to print out o'one in the minutes vs one
+#define DO_O 1 // Set to print out o'one in the minutes vs one
 
 static const char* const ONES[] = {
   "o'clock",
