@@ -7,6 +7,19 @@
 #define DEBUG 0
 #define BUFFER_SIZE 44
 
+#define MY_UUID { 0xFE, 0x1F, 0xAD, 0xA8, 0xCF, 0x90, 0x40, 0xD4, 0x90, 0xBC, 0x42, 0xC2, 0x80, 0x3C, 0xAD, 0x73 }
+PBL_APP_INFO(MY_UUID,
+             "My Text WatchFace", "Room 3327",
+             1, 0, /* App version */
+             DEFAULT_MENU_ICON,
+#if DEBUG
+             APP_INFO_STANDARD_APP
+#else
+             APP_INFO_WATCH_FACE
+#endif
+);
+
+#if 0
 #define MY_UUID { 0x49, 0x6E, 0x04, 0xAD, 0x13, 0x2A, 0x48, 0xAB, 0xB1, 0x65, 0x7F, 0xF4, 0xA9, 0x98, 0x72, 0xD2 }
 PBL_APP_INFO(MY_UUID,
              "TextWatch", "Wip Interactive",
@@ -18,6 +31,7 @@ PBL_APP_INFO(MY_UUID,
              APP_INFO_WATCH_FACE
 #endif
 );
+#endif
 
 Window window;
 
@@ -217,7 +231,7 @@ void handle_init(AppContextRef ctx) {
 	window_set_background_color(&window, GColorBlack);
 
 	// Init resources
-	resource_init_current_app(&APP_RESOURCES);
+	resource_init_current_app(&VERSION);
 	
 	// 1st line layers
 	text_layer_init(&line1.currentLayer, GRect(0, 18, 144, 50));
