@@ -3,6 +3,55 @@
 
 #define DO_O 1 // Set to print out o'one in the minutes vs one
 
+static const char* const MONTHS[] = {
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december"
+};
+
+static const char* const DAYS[] = {
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "nineth",
+  "tenth",
+  "eleventh",
+  "twelth",
+  "thirteenth",
+  "fourteenth",
+  "fifteenth",
+  "sixteenth",
+  "seventeenth",
+  "eightteenth",
+  "nineteenth",
+  "twentieth",
+  "twenty-first",
+  "twenty-second",
+  "twenty-third",
+  "twenty-fourth",
+  "twenty-fifth",
+  "twenty-sixth",
+  "twenty-seventh",
+  "twenty-eighth",
+  "twenty-nineth",
+  "thirtieth",
+  "thirty-first"
+};
+
 static const char* const ONES[] = {
   "o'clock",
   "one",
@@ -124,7 +173,7 @@ void time_to_words(int hours, int minutes, char* words, size_t length) {
   remaining -= append_string(words, remaining, " ");
 }
 
-void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line3, size_t length)
+void time_to_4words(int month, int day, int hours, int minutes, char *line1, char *line2, char *line3, char *line4, size_t length)
 {
 	char value[length];
 	time_to_words(hours, minutes, value, length);
@@ -132,6 +181,7 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 	memset(line1, 0, length);
 	memset(line2, 0, length);
 	memset(line3, 0, length);
+	memset(line4, 0, length);
 	
 	char *start = value;
 	char *pch = strstr (start, " ");
@@ -148,11 +198,15 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 	}
 	
 	// Truncate long teen values
-        if (trunc_minutes(minutes)) {
+  if (trunc_minutes(minutes)) {
 		char *pch = strstr(line2, "teen");
 		if (pch) {
 			memcpy(line3, pch, 4);
 			pch[0] = 0;
 		}
 	}
+
+  strcat(line4, MONTHS[month]);
+  strcat(line4, " ");
+  strcat(line4, DAYS[day-1]);
 }

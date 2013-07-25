@@ -45,12 +45,14 @@ typedef struct {
 Line line1;
 Line line2;
 Line line3;
+Line line4;
 
 PblTm t;
 
 static char line1Str[2][BUFFER_SIZE];
 static char line2Str[2][BUFFER_SIZE];
 static char line3Str[2][BUFFER_SIZE];
+static char line4Str[2][BUFFER_SIZE];
 
 static bool textInitialized = false;
 
@@ -132,8 +134,9 @@ void display_time(PblTm *t)
 	char textLine1[BUFFER_SIZE];
 	char textLine2[BUFFER_SIZE];
 	char textLine3[BUFFER_SIZE];
+	char textLine4[BUFFER_SIZE];
 	
-	time_to_3words(t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, BUFFER_SIZE);
+	time_to_4words(t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, textLine1, textLine2, textLine3, textLine4, BUFFER_SIZE);
 	
 	if (needToUpdateLine(&line1, line1Str, textLine1)) {
 		updateLineTo(&line1, line1Str, textLine1);	
@@ -144,16 +147,20 @@ void display_time(PblTm *t)
 	if (needToUpdateLine(&line3, line3Str, textLine3)) {
 		updateLineTo(&line3, line3Str, textLine3);	
 	}
+	if (needToUpdateLine(&line4, line4Str, textLine4)) {
+		updateLineTo(&line4, line4Str, textLine4);	
+	}
 }
 
 // Update screen without animation first time we start the watchface
 void display_initial_time(PblTm *t)
 {
-	time_to_3words(t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], BUFFER_SIZE);
+	time_to_4words(t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, line1Str[0], line2Str[0], line3Str[0], line4Str[0], BUFFER_SIZE);
 	
 	text_layer_set_text(&line1.currentLayer, line1Str[0]);
 	text_layer_set_text(&line2.currentLayer, line2Str[0]);
 	text_layer_set_text(&line3.currentLayer, line3Str[0]);
+	text_layer_set_text(&line4.currentLayer, line4Str[0]);
 }
 
 
@@ -173,6 +180,15 @@ void configureLightLayer(TextLayer *textlayer)
 	text_layer_set_text_color(textlayer, GColorWhite);
 	text_layer_set_background_color(textlayer, GColorClear);
 	text_layer_set_text_alignment(textlayer, GTextAlignmentLeft);
+}
+
+// Configure for the 4th line
+void configureTinyLayer(TextLayer *textlayer)
+{
+	text_layer_set_font(textlayer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
+	text_layer_set_text_color(textlayer, GColorWhite);
+	text_layer_set_background_color(textlayer, GColorClear);
+	text_layer_set_text_alignment(textlayer, GTextAlignmentCenter);
 }
 
 
@@ -251,6 +267,12 @@ void handle_init(AppContextRef ctx) {
 	configureLightLayer(&line3.currentLayer);
 	configureLightLayer(&line3.nextLayer);
 
+	// 4th layers
+	text_layer_init(&line4.currentLayer, GRect(0, 152, 144, 16));
+	text_layer_init(&line4.nextLayer, GRect(144, 152, 144, 16));
+	configureTinyLayer(&line4.currentLayer);
+	configureTinyLayer(&line4.nextLayer);
+
 	// Configure time on init
 	get_time(&t);
 	display_initial_time(&t);
@@ -262,6 +284,8 @@ void handle_init(AppContextRef ctx) {
 	layer_add_child(&window.layer, &line2.nextLayer.layer);
 	layer_add_child(&window.layer, &line3.currentLayer.layer);
 	layer_add_child(&window.layer, &line3.nextLayer.layer);
+	layer_add_child(&window.layer, &line4.currentLayer.layer);
+	layer_add_child(&window.layer, &line4.nextLayer.layer);
 	
 #if DEBUG
 	// Button functionality
